@@ -113,17 +113,24 @@ def copy_temp_dir(path):
 
 
 if __name__ == '__main__':
-    # сканирование каталогов и создание списков
-    #list_folder = scan_dir(books_folder)
-    # копирование каталогов из временной папки
-    #copy_temp_dir(temp_path)
-    list_folder = scan_all(books_folder)
-    while True:
-        finding = input('Введите ключевое слово для поиска: ').lower()
-        for folder in list_folder:
-            fold = folder.lower()
-            if fold.find(finding) >= 0:
-                print(folder)
+    mode = input('Введите режим работы (scan, copy, find): ')
+    if mode == 'scan':
+        # сканирование каталогов и создание списков
+        list_folder = scan_dir(books_folder)
+    elif mode == 'copy':
+        # копирование каталогов из временной папки
+        copy_temp_dir(temp_path)
+    elif mode == 'find':
+        # Поиск по ключевому слову аудикниг в библиотеке
+        list_folder = scan_all(books_folder)
+        while True:
+            finding = input('Введите ключевое слово для поиска: ').lower()
+            for folder in list_folder:
+                fold = folder.lower()
+                if fold.find(finding) >= 0:
+                    print(folder)
+    else:
+        pass
 
 
 

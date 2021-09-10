@@ -2,6 +2,7 @@ import psycopg2
 import datetime
 from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from psycopg2 import sql
 from library_class import MyLibrary
 
 class MyBase:
@@ -162,6 +163,90 @@ class MyBase:
             delta_time = datetime.timedelta(days=day)
             item_tuple = (cur_time-delta_time, cur_time, )
             cursor.execute(insert_query, item_tuple)
+            record = cursor.fetchall()
+            for i in record:
+                # Отображение результата запроса
+                print(i)
+
+        except (Exception, Error) as error:
+            print("Ошибка при работе с PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("Соединение с PostgreSQL закрыто")
+
+    def select_by_litera(self, litera: str):
+        try:
+            # Подключиться к существующей базе данных
+            connection = psycopg2.connect(user="postgres",
+                                          # пароль, который указали при установке PostgreSQL
+                                          password="krevedko78",
+                                          host="127.0.0.1",
+                                          port="5432",
+                                          database="postgres_db")
+
+            cursor = connection.cursor()
+            # Выполнение SQL-запроса для вставки данных
+            # проверка на наличие записи в базе
+            insert_query = """SELECT * FROM audiobooks WHERE LOWER(author) LIKE '{}%'""".format(litera.lower())
+            cursor.execute(insert_query)
+            record = cursor.fetchall()
+            for i in record:
+                # Отображение результата запроса
+                print(i)
+
+        except (Exception, Error) as error:
+            print("Ошибка при работе с PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("Соединение с PostgreSQL закрыто")
+
+    def select_by_author(self, litera: str):
+        try:
+            # Подключиться к существующей базе данных
+            connection = psycopg2.connect(user="postgres",
+                                          # пароль, который указали при установке PostgreSQL
+                                          password="krevedko78",
+                                          host="127.0.0.1",
+                                          port="5432",
+                                          database="postgres_db")
+
+            cursor = connection.cursor()
+            # Выполнение SQL-запроса для вставки данных
+            # проверка на наличие записи в базе
+            insert_query = """SELECT * FROM audiobooks WHERE LOWER(author) LIKE '%{n}%'""".format(n=litera.lower())
+            cursor.execute(insert_query)
+            record = cursor.fetchall()
+            for i in record:
+                # Отображение результата запроса
+                print(i)
+
+        except (Exception, Error) as error:
+            print("Ошибка при работе с PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("Соединение с PostgreSQL закрыто")
+
+    def select_by_name(self, litera: str):
+        try:
+            # Подключиться к существующей базе данных
+            connection = psycopg2.connect(user="postgres",
+                                          # пароль, который указали при установке PostgreSQL
+                                          password="krevedko78",
+                                          host="127.0.0.1",
+                                          port="5432",
+                                          database="postgres_db")
+
+            cursor = connection.cursor()
+            # Выполнение SQL-запроса для вставки данных
+            # проверка на наличие записи в базе
+            insert_query = """SELECT * FROM audiobooks WHERE LOWER(name_book) LIKE '%{n}%'""".format(n=litera.lower())
+            cursor.execute(insert_query)
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса

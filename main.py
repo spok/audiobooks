@@ -28,7 +28,9 @@ if __name__ == '__main__':
     # lib.update_base()
 
     # lib.upgrade_base()
-    lib.select_by_date(2)
+    # lib.select_by_date(2)
+
+    lib.select_by_name('ангел')
 
 
 

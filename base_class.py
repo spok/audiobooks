@@ -9,6 +9,8 @@ class MyBase:
     def __init__(self):
         self.db_name = 'audibooks.db'
         self.library = MyLibrary()
+        self.find_element = []
+        self.find_author = []
 
     def create_base(self):
         try:
@@ -177,6 +179,8 @@ class MyBase:
                 print("Соединение с PostgreSQL закрыто")
 
     def select_by_litera(self, litera: str):
+        self.find_element = []
+        self.find_author = []
         try:
             # Подключиться к существующей базе данных
             connection = psycopg2.connect(user="postgres",
@@ -194,6 +198,9 @@ class MyBase:
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
+                self.find_element.append(i)
+                if i[1] not in self.find_author:
+                    self.find_author.append(i[1])
                 print(i)
 
         except (Exception, Error) as error:
@@ -205,6 +212,8 @@ class MyBase:
                 print("Соединение с PostgreSQL закрыто")
 
     def select_by_author(self, litera: str):
+        self.find_element = []
+        self.find_author = []
         try:
             # Подключиться к существующей базе данных
             connection = psycopg2.connect(user="postgres",
@@ -222,6 +231,8 @@ class MyBase:
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
+                if i[1] not in self.find_author:
+                    self.find_author.append(i[1])
                 print(i)
 
         except (Exception, Error) as error:
@@ -233,6 +244,7 @@ class MyBase:
                 print("Соединение с PostgreSQL закрыто")
 
     def select_by_name(self, litera: str):
+        self.find_element = []
         try:
             # Подключиться к существующей базе данных
             connection = psycopg2.connect(user="postgres",
@@ -250,6 +262,7 @@ class MyBase:
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
+                self.find_element.append(i)
                 print(i)
 
         except (Exception, Error) as error:

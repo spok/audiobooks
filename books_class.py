@@ -34,7 +34,3 @@ class MyBook:
             total = 0
             print('Ошибка чтения - ', path)
         return tag.duration
-
-
-    def get_days_after(self, days: int) -> int:
-        pass

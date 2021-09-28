@@ -7,6 +7,7 @@ import wave  # создание и чтение аудиофайлов форм�
 import os  # работа с файловой системой
 import random
 from base_class import MyBase
+from config import BOT_CONFIG
 
 
 lib = MyBase()
@@ -159,22 +160,13 @@ def view_by_book(*args: tuple):
 def execute_command_with_name(command_name: str, *args: list):
     """
     Выполнение заданной пользователем команды и аргументами
-    :param command_name: название команды
-    :param args: аргументы, которые будут переданы в метод
-    :return:
     """
-    for key in commands.keys():
-        if command_name in key:
-            commands[key](*args)
-        else:
-            pass  # print("Command not found")
-
-# перечень команд для использования (качестве ключей словаря используется hashable-тип tuple)
-commands = {
-    ("буква", "на букву", "литера"): view_by_litera,
-    ("автор", "автора", "писатель"): view_by_author,
-    ("книга", "произведение", "книги"): view_by_book
-}
+    if command_name == 'find_author_letter':
+        view_by_litera(args[0])
+    if command_name == 'find_author':
+        view_by_author(args[0])
+    if command_name == 'find_books':
+        view_by_book(args[0])
 
 if __name__ == "__main__":
 

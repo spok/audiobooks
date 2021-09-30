@@ -7,7 +7,7 @@ class MyBase:
         self.db_name = 'audibooks.db'
         self.library = MyLibrary()
         self.find_element = []
-        self.find_author = []
+        self.find_author = set()
 
     def create_base_table(self):
         try:
@@ -96,8 +96,7 @@ class MyBase:
                                   book.date_added,
                                   )
                     cursor.execute(insert_query, item_tuple)
-                    conn.commit()
-                    print("Книга успешно добавлена")
+            conn.commit()
 
         except Exception as error:
             print("Ошибка при работе с базой данных", error)
@@ -130,22 +129,23 @@ class MyBase:
 
     def select_by_litera(self, litera: str):
         self.find_element = []
-        self.find_author = []
+        self.find_author = set()
         try:
             # Подключиться к существующей базе данных
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
             # Выполнение SQL-запроса для вставки данных
             # проверка на наличие записи в базе
-            insert_query = """SELECT * FROM books WHERE author LIKE '{}%' COLLATE NOCASE""".format(litera.lower())
+            insert_query = f"""SELECT * FROM books WHERE ((author LIKE '{litera}%') OR 
+                            (author LIKE'{litera.lower()}%'))"""
             cursor.execute(insert_query)
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
                 self.find_element.append(i)
                 if i[1] not in self.find_author:
-                    self.find_author.append(i[1])
-                print(i)
+                    self.find_author.add(i[1])
+            print(self.find_author)
 
         except Exception as error:
             print("Ошибка при работе с базой данных", error)
@@ -155,22 +155,22 @@ class MyBase:
 
     def select_by_author(self, litera: str):
         self.find_element = []
-        self.find_author = []
+        self.find_author = set()
         try:
             # Подключиться к существующей базе данных
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
             # Выполнение SQL-запроса для вставки данных
             # проверка на наличие записи в базе
-            insert_query = """SELECT * FROM books WHERE author LIKE '%{n}%' COLLATE NOCASE""".format(n=litera.lower())
+            insert_query = f"""SELECT * FROM books WHERE ((author LIKE '%{litera}%') OR 
+                            (author LIKE'%{litera.capitalize()}%'))"""
             cursor.execute(insert_query)
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
                 if i[1] not in self.find_author:
-                    self.find_author.append(i[1])
-                print(i)
-
+                    self.find_author.add(i[1])
+            print(self.find_author)
         except Exception as error:
             print("Ошибка при работе с базой данных", error)
         finally:
@@ -185,13 +185,14 @@ class MyBase:
             cursor = conn.cursor()
             # Выполнение SQL-запроса для вставки данных
             # проверка на наличие записи в базе
-            insert_query = """SELECT * FROM books WHERE name_book LIKE '%{n}%' COLLATE NOCASE""".format(n=litera.lower())
+            insert_query = f"""SELECT * FROM books WHERE ((name_book LIKE '%{litera}%') OR 
+                            (name_book LIKE'%{litera.capitalize()}%'))"""
             cursor.execute(insert_query)
             record = cursor.fetchall()
             for i in record:
                 # Отображение результата запроса
-                self.find_element.append(i)
-                print(i)
+                self.find_element.append(i[2])
+            print(self.find_element)
         except Exception as error:
             print("Ошибка при работе с базой данных", error)
         finally:
@@ -209,4 +210,14 @@ class MyBase:
 # тестирование работы базы
 if __name__ == "__main__":
     b = MyBase()
-    b.update_base()
+    # тест создания базы
+    # b.create_base_table()
+    # b.update_base()
+    # тест запросов из базы по букве
+    # b.select_by_litera('А')
+    # тест запросов по автору
+    # b.select_by_author('азимов')
+    # тест запросов по названию книги
+    # b.select_by_name('ангел')
+    # тест запроса по дате добавления
+    # b.select_by_date(30)

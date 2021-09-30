@@ -133,7 +133,7 @@ class MyLibrary:
                         tot += 1
 
                 # определение времени создания папки
-                book.date_added = datetime.datetime.fromtimestamp(os.path.getmtime(dir[0]))
+                book.date_added = os.path.getmtime(dir[0])
                 self.list_books.append(book)
 
     def create_dir(self, name) -> bool:

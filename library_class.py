@@ -227,7 +227,7 @@ class MyLibrary:
                 else:
                     book.number_cycle = 0
                 book.path = to_path.replace(self.books_path, '')
-                book.date_added = datetime.datetime.fromtimestamp(os.path.getmtime(to_path))
+                book.date_added = os.path.getmtime(to_path)
 
                 # определение общей продолжительности звучания книги и количество mp3 файлов
                 book.total_duration = 0.0

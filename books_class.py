@@ -1,6 +1,6 @@
-import datetime
 import os
 from tinytag import TinyTag
+
 
 class MyBook:
     def __init__(self):
@@ -30,7 +30,7 @@ class MyBook:
         try:
             tag = TinyTag.get(path)
             total = tag.duration
-        except:
-            total = 0
-            print('Ошибка чтения - ', path)
-        return tag.duration
+        except FileNotFoundError as err:
+            total = 0.0
+            print(f'Ошибка чтения {path} - {err}')
+        return total

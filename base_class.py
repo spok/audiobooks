@@ -2,6 +2,7 @@ import sqlite3
 import datetime
 from library_class import MyLibrary
 
+
 class MyBase:
     def __init__(self):
         self.db_name = 'audibooks.db'
@@ -33,13 +34,17 @@ class MyBase:
             # создание таблицы с новыми книгами, связь таблиц по ID
             create_table_query = """CREATE TABLE IF NOT EXISTS new_books
                                   (ID                INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                  base_ID             INTEGER    NOT NULL);"""
+                                  base_ID             INTEGER    NOT NULL,
+                                  author             TEXT    NOT NULL,
+                                  name_book               TEXT    NOT NULL);"""
             cursor.execute(create_table_query)
             conn.commit()
             # создание таблицы с последними прочитанными книгами, связь таблиц по ID
             create_table_query = """CREATE TABLE IF NOT EXISTS play_books
                                   (ID                INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                  base_ID             INTEGER    NOT NULL);"""
+                                  base_ID             INTEGER    NOT NULL,
+                                  author             TEXT    NOT NULL,
+                                  name_book               TEXT    NOT NULL);"""
             cursor.execute(create_table_query)
             conn.commit()
         except Exception as error:
@@ -69,17 +74,19 @@ class MyBase:
             conn.close()
             print("Соединение с базой закрыто")
 
-    def save_base(self, books_list: list):
+    def save_base(self, books_list: list, mode='update'):
         try:
             # Подключиться к существующей базе данных
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
+            if mode == 'add':
+                cursor2 = conn.cursor()
 
             # Выполнение SQL-запроса для вставки данных
             for book in books_list:
                 # проверка на наличие записи в базе
                 insert_query = """SELECT * FROM books WHERE author=? and name_book=?"""
-                item_tuple = (book.author, book.name, )
+                item_tuple = (book.author, book.name,)
                 cursor.execute(insert_query, item_tuple)
                 record = cursor.fetchall()
                 if len(record) == 0:
@@ -87,15 +94,20 @@ class MyBase:
                     insert_query = """INSERT INTO books(author, name_book, name_cycle, number_cycle, path, count_file, 
                     total_duration, date_added) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
                     item_tuple = (book.author,
-                                  book.name,
-                                  book.name_cycle,
-                                  book.number_cycle,
-                                  book.path,
-                                  book.count_file,
-                                  book.total_duration,
-                                  book.date_added,
-                                  )
+                                   book.name,
+                                   book.name_cycle,
+                                   book.number_cycle,
+                                   book.path,
+                                   book.count_file,
+                                   book.total_duration,
+                                   book.date_added,
+                                   )
                     cursor.execute(insert_query, item_tuple)
+                    curid = cursor.lastrowid
+                    if mode == 'add':
+                        insert_query = """INSERT INTO new_books(base_ID, author, name_book) VALUES (?, ?, ?)"""
+                        item_tuple = (curid, book.author, book.name,)
+                        cursor2.execute(insert_query, item_tuple)
             conn.commit()
 
         except Exception as error:
@@ -103,7 +115,6 @@ class MyBase:
         finally:
             conn.close()
             print("Соединение с базой закрыто")
-
 
     def select_by_date(self, day: int):
         try:
@@ -115,7 +126,7 @@ class MyBase:
             insert_query = """SELECT * FROM books WHERE date_added>? AND date_added<?"""
             cur_time = datetime.datetime.now()
             delta_time = datetime.timedelta(days=day)
-            item_tuple = (datetime.datetime.timestamp(cur_time-delta_time), datetime.datetime.timestamp(cur_time), )
+            item_tuple = (datetime.datetime.timestamp(cur_time - delta_time), datetime.datetime.timestamp(cur_time),)
             cursor.execute(insert_query, item_tuple)
             record = cursor.fetchall()
             for i in record:
@@ -201,18 +212,21 @@ class MyBase:
 
     def update_base(self):
         self.library.scan_dir_book(self.library.books_path)
-        self.save_base(books_list=self.library.list_books)
+        self.save_base(books_list=self.library.list_books, mode='update')
 
     def upgrade_base(self):
         self.library.copy_temp_dir()
-        self.save_base(books_list=self.library.join_books)
+        self.save_base(books_list=self.library.join_books, mode='add')
 
-# тестирование работы базы
-if __name__ == "__main__":
-    b = MyBase()
+
+# тестирование работы модуля
+# if __name__ == "__main__":
+#     b = MyBase()
     # тест создания базы
     # b.create_base_table()
     # b.update_base()
+    # b.upgrade_base()
+    # b.delete_table()
     # тест запросов из базы по букве
     # b.select_by_litera('А')
     # тест запросов по автору

@@ -7,21 +7,18 @@ import wave  # создание и чтение аудиофайлов форм�
 import os  # работа с файловой системой
 import random
 from base_class import MyBase
+from vocs_recognizer import Recognizer
 from config import BOT_CONFIG
 
-
 lib = MyBase()
+rec = Recognizer()
 
-class VoiceAssistant:
-    """
-    Настройки голосового ассистента, включающие имя, пол, язык речи
-    Примечание: для мультиязычных голосовых ассистентов лучше создать отдельный класс,
-    который будет брать перевод из JSON-файла с нужным языком
-    """
-    name = ""
-    sex = ""
-    speech_language = "ru-RU"
-    recognition_language = "ru-RU"
+# текущее положение при прослушивании - название автора или книги
+current_author = ''
+current_book = ''
+# список авторов и книг в выбранном диапазоне
+list_author = []
+list_book = []
 
 
 def setup_assistant_voice():
@@ -30,9 +27,9 @@ def setup_assistant_voice():
     """
     voices = ttsEngine.getProperty("voices")
 
-    assistant.recognition_language = "ru-RU"
     # Microsoft Irina Desktop - Russian
     ttsEngine.setProperty("voice", voices[0].id)
+
 
 def record_and_recognize_audio(*args: tuple):
     """
@@ -59,7 +56,7 @@ def record_and_recognize_audio(*args: tuple):
         # использование online-распознавания через Google (высокое качество распознавания)
         try:
             print("Started recognition...")
-            recognized_data = recognizer.recognize_google(audio, language=assistant.recognition_language).lower()
+            recognized_data = recognizer.recognize_google(audio, language='ru-RU').lower()
 
         except speech_recognition.UnknownValueError:
             pass  # play_voice_assistant_speech("What did you say again?")
@@ -70,6 +67,7 @@ def record_and_recognize_audio(*args: tuple):
             recognized_data = use_offline_recognition()
 
         return recognized_data
+
 
 def use_offline_recognition():
     """
@@ -101,6 +99,7 @@ def use_offline_recognition():
 
     return recognized_data
 
+
 def play_voice_assistant_speech(text_to_speech):
     """
     Проигрывание речи ответов голосового ассистента (без сохранения аудио)
@@ -108,6 +107,7 @@ def play_voice_assistant_speech(text_to_speech):
     """
     ttsEngine.say(str(text_to_speech))
     ttsEngine.runAndWait()
+
 
 def view_by_litera(*args: tuple):
     litera = "".join(args[0])
@@ -125,6 +125,7 @@ def view_by_litera(*args: tuple):
                 break
         i += 1
 
+
 def view_by_author(*args: tuple):
     name = "".join(args[0])
     lib.select_by_author(name)
@@ -140,6 +141,7 @@ def view_by_author(*args: tuple):
             if v_input == 'нет':
                 break
         i += 1
+
 
 def view_by_book(*args: tuple):
     name = "".join(args[0])
@@ -157,6 +159,7 @@ def view_by_book(*args: tuple):
                 break
         i += 1
 
+
 def execute_command_with_name(command_name: str, *args: list):
     """
     Выполнение заданной пользователем команды и аргументами
@@ -168,6 +171,7 @@ def execute_command_with_name(command_name: str, *args: list):
     if command_name == 'find_books':
         view_by_book(args[0])
 
+
 if __name__ == "__main__":
 
     # инициализация инструментов распознавания и ввода речи
@@ -176,12 +180,6 @@ if __name__ == "__main__":
 
     # инициализация инструмента синтеза речи
     ttsEngine = pyttsx3.init()
-
-    # настройка данных голосового помощника
-    assistant = VoiceAssistant()
-    assistant.name = "Alice"
-    assistant.sex = "female"
-    assistant.speech_language = "ru"
 
     # установка голоса по умолчанию
     setup_assistant_voice()
@@ -197,5 +195,3 @@ if __name__ == "__main__":
         command = voice_input[0]
         command_options = [str(input_part) for input_part in voice_input[1:len(voice_input)]]
         execute_command_with_name(command, command_options)
-
-
